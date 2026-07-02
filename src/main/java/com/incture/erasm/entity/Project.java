@@ -1,6 +1,8 @@
 package com.incture.erasm.entity;
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "projects")
@@ -27,27 +29,36 @@ public class Project {
 
     @Column(nullable = false)
     private Double budget;
+    
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ResourceRequest> resourceRequests = new ArrayList<>();
 
-    // Default Constructor
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Allocation> allocations = new ArrayList<>();
+
     public Project() {
     }
 
-    // Parameterized Constructor
-    public Project(Long projectId, String projectName, String clientName,
-                   String startDate, String endDate,
-                   String technologyStack, Double budget) {
-        this.projectId = projectId;
-        this.projectName = projectName;
-        this.clientName = clientName;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.technologyStack = technologyStack;
-        this.budget = budget;
-    }
+    
+    public Project(Long projectId, String projectName, String clientName, String startDate, String endDate,
+			String technologyStack, Double budget, List<ResourceRequest> resourceRequests,
+			List<Allocation> allocations) {
+		super();
+		this.projectId = projectId;
+		this.projectName = projectName;
+		this.clientName = clientName;
+		this.startDate = startDate;
+		this.endDate = endDate;
+		this.technologyStack = technologyStack;
+		this.budget = budget;
+		this.resourceRequests = resourceRequests;
+		this.allocations = allocations;
+	}
 
-    // Getters and Setters
 
-    public Long getProjectId() {
+
+
+	public Long getProjectId() {
         return projectId;
     }
 
@@ -102,4 +113,21 @@ public class Project {
     public void setBudget(Double budget) {
         this.budget = budget;
     }
+
+	public List<ResourceRequest> getResourceRequests() {
+		return resourceRequests;
+	}
+
+	public void setResourceRequests(List<ResourceRequest> resourceRequests) {
+		this.resourceRequests = resourceRequests;
+	}
+
+	public List<Allocation> getAllocations() {
+		return allocations;
+	}
+
+	public void setAllocations(List<Allocation> allocations) {
+		this.allocations = allocations;
+	}
+    
 }

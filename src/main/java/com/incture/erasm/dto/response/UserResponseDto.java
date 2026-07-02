@@ -1,42 +1,22 @@
-package com.incture.erasm.entity;
-import jakarta.persistence.*;
+package com.incture.erasm.dto.response;
 
-@Entity
-@Table(name = "users")
-public class User {
+public class UserResponseDto {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
-
-    @Column(nullable = false)
     private String firstName;
-
-    @Column(nullable = false)
     private String lastName;
-
-    @Column(nullable = false, unique = true)
     private String email;
-
-    @Column(nullable = false)
-    private String password;
-
-    @Column(nullable = false)
     private boolean active;
 
-
-    public User() {
+    public UserResponseDto() {
     }
 
-    public User(Long userId, String firstName, String lastName,
-                String email, String password, boolean active) {
+    public UserResponseDto(Long userId, String firstName, String lastName, String email, boolean active) {
         this.userId = userId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
-        this.password = password;
         this.active = active;
-      
     }
 
     public Long getUserId() {
@@ -71,14 +51,6 @@ public class User {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public boolean isActive() {
         return active;
     }
@@ -86,6 +58,4 @@ public class User {
     public void setActive(boolean active) {
         this.active = active;
     }
-
-   
 }

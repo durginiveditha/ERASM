@@ -1,5 +1,8 @@
 package com.incture.erasm.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -15,13 +18,19 @@ public class Skill {
 
     private String description;
 
+    // Skill -> EmployeeSkill (One Skill can belong to many Employees)
+    @OneToMany(mappedBy = "skill", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<EmployeeSkill> employeeSkills = new ArrayList<>();
+
     public Skill() {
     }
 
-    public Skill(Long skillId, String skillName, String description) {
+    public Skill(Long skillId, String skillName, String description,
+                 List<EmployeeSkill> employeeSkills) {
         this.skillId = skillId;
         this.skillName = skillName;
         this.description = description;
+        this.employeeSkills = employeeSkills;
     }
 
     public Long getSkillId() {
@@ -46,5 +55,13 @@ public class Skill {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<EmployeeSkill> getEmployeeSkills() {
+        return employeeSkills;
+    }
+
+    public void setEmployeeSkills(List<EmployeeSkill> employeeSkills) {
+        this.employeeSkills = employeeSkills;
     }
 }

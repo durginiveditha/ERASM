@@ -1,5 +1,8 @@
 package com.incture.erasm.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -22,33 +25,50 @@ public class Employee {
     @Column(nullable = false)
     private int experience;
 
-    @Column(nullable = false)
+    @Column(nullable =false)
     private boolean availability;
 
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
+    
+    @ManyToOne
+    @JoinColumn(name = "role_id", nullable = false)
+    private Role role;
 
-    // Default Constructor
+    // Employee -> EmployeeSkill (One Employee can have many skills)
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<EmployeeSkill> employeeSkills = new ArrayList<>();
+
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Certification> certifications = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Allocation> allocations = new ArrayList<>();
+    
     public Employee() {
     }
 
-    // Parameterized Constructor
-    public Employee(Long employeeId, String employeeCode, String department,
-                    String designation, int experience,
-                    boolean availability, User user) {
-        this.employeeId = employeeId;
-        this.employeeCode = employeeCode;
-        this.department = department;
-        this.designation = designation;
-        this.experience = experience;
-        this.availability = availability;
-        this.user = user;
-    }
 
-    // Getters and Setters
+	public Employee(Long employeeId, String employeeCode, String department, String designation, int experience,
+			boolean availability, User user, Role role, List<EmployeeSkill> employeeSkills,
+			List<Certification> certifications, List<Allocation> allocations) {
+		super();
+		this.employeeId = employeeId;
+		this.employeeCode = employeeCode;
+		this.department = department;
+		this.designation = designation;
+		this.experience = experience;
+		this.availability = availability;
+		this.user = user;
+		this.role = role;
+		this.employeeSkills = employeeSkills;
+		this.certifications = certifications;
+		this.allocations = allocations;
+	}
 
-    public Long getEmployeeId() {
+
+	public Long getEmployeeId() {
         return employeeId;
     }
 
@@ -103,4 +123,36 @@ public class Employee {
     public void setUser(User user) {
         this.user = user;
     }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+    
+    public List<EmployeeSkill> getEmployeeSkills() {
+        return employeeSkills;
+    }
+
+    public void setEmployeeSkills(List<EmployeeSkill> employeeSkills) {
+        this.employeeSkills = employeeSkills;
+    }
+
+	public List<Certification> getCertifications() {
+		return certifications;
+	}
+
+	public void setCertifications(List<Certification> certifications) {
+		this.certifications = certifications;
+	}
+	public List<Allocation> getAllocations() {
+		return allocations;
+	}
+
+
+	public void setAllocations(List<Allocation> allocations) {
+		this.allocations = allocations;
+	}
 }

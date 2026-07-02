@@ -1,50 +1,35 @@
-package com.incture.erasm.entity;
-import jakarta.persistence.*;
+package com.incture.erasm.dto.request;
 
-@Entity
-@Table(name = "users")
-public class User {
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+public class UserRequestDto {
 
-    @Column(nullable = false)
+    @NotBlank(message = "First name is required")
     private String firstName;
 
-    @Column(nullable = false)
+    @NotBlank(message = "Last name is required")
     private String lastName;
 
-    @Column(nullable = false, unique = true)
+    @Email(message = "Invalid email format")
+    @NotBlank(message = "Email is required")
     private String email;
 
-    @Column(nullable = false)
+    @Size(min = 8, message = "Password must contain at least 8 characters")
     private String password;
 
-    @Column(nullable = false)
     private boolean active;
 
-
-    public User() {
+    public UserRequestDto() {
     }
 
-    public User(Long userId, String firstName, String lastName,
-                String email, String password, boolean active) {
-        this.userId = userId;
+    public UserRequestDto(String firstName, String lastName, String email, String password, boolean active) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
         this.active = active;
-      
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
     }
 
     public String getFirstName() {
@@ -86,6 +71,4 @@ public class User {
     public void setActive(boolean active) {
         this.active = active;
     }
-
-   
 }
