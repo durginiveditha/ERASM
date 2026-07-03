@@ -12,22 +12,33 @@ import com.incture.erasm.exception.ResourceNotFoundException;
 import com.incture.erasm.mapper.UserMapper;
 import com.incture.erasm.repository.UserRepository;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 public class UserService {
 
+	private static final Logger logger =
+            LoggerFactory.getLogger(UserService.class);
     private final UserRepository userRepository;
-
-    public UserService(UserRepository userRepository) {
+    private final PasswordEncoder passwordEncoder;
+    
+    public UserService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     // Create User
     public UserResponseDto createUser(UserRequestDto requestDto) {
 
+    	logger.info("Creating user with email: {}", requestDto.getEmail());
         User user = UserMapper.requestDtoToEntity(requestDto);
-
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         User savedUser = userRepository.save(user);
-
+        logger.info("Creating user with email: {}", requestDto.getEmail());
         return UserMapper.entityToResponseDto(savedUser);
     }
 
@@ -35,7 +46,12 @@ public class UserService {
     public UserResponseDto getUserById(Long userId) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        		.orElseThrow(() -> {
+
+                    logger.warn("User not found with ID: {}", userId);
+
+                    return new ResourceNotFoundException("User not found");
+                });
 
         return UserMapper.entityToResponseDto(user);
     }
@@ -52,8 +68,14 @@ public class UserService {
     // Update User
     public UserResponseDto updateUser(Long userId, UserRequestDto requestDto) {
 
+    	logger.info("Updating user with ID: {}", userId);
         User existingUser = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        		.orElseThrow(() -> {
+
+                    logger.warn("User not found with ID: {}", userId);
+
+                    return new ResourceNotFoundException("User not found");
+                });
 
         existingUser.setFirstName(requestDto.getFirstName());
         existingUser.setLastName(requestDto.getLastName());
@@ -62,16 +84,22 @@ public class UserService {
         existingUser.setActive(requestDto.isActive());
 
         User updatedUser = userRepository.save(existingUser);
-
+        logger.info("User updated successfully. User ID: {}", updatedUser.getUserId());
         return UserMapper.entityToResponseDto(updatedUser);
     }
 
     // Delete User
     public void deleteUser(Long userId) {
-
+    	logger.info("Deleting user with ID: {}", userId);
         User existingUser = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        		.orElseThrow(() -> {
+
+                    logger.warn("User not found with ID: {}", userId);
+
+                    return new ResourceNotFoundException("User not found");
+                });
 
         userRepository.delete(existingUser);
+        logger.info("User deleted successfully. User ID: {}", userId);
     }
 }

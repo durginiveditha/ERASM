@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.incture.erasm.dto.request.RoleRequestDto;
@@ -22,7 +23,7 @@ public class RoleController {
         this.roleService = roleService;
     }
 
-    // Create Role
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<RoleResponseDto> createRole(
             @Valid @RequestBody RoleRequestDto requestDto) {
@@ -32,7 +33,7 @@ public class RoleController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    // Get Role By Id
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<RoleResponseDto> getRoleById(
             @PathVariable Long id) {
@@ -40,14 +41,14 @@ public class RoleController {
         return ResponseEntity.ok(roleService.getRoleById(id));
     }
 
-    // Get All Roles
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<RoleResponseDto>> getAllRoles() {
 
         return ResponseEntity.ok(roleService.getAllRoles());
     }
 
-    // Update Role
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<RoleResponseDto> updateRole(
             @PathVariable Long id,
@@ -56,7 +57,7 @@ public class RoleController {
         return ResponseEntity.ok(roleService.updateRole(id, requestDto));
     }
 
-    // Delete Role
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteRole(
             @PathVariable Long id) {

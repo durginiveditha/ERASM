@@ -17,9 +17,14 @@ import com.incture.erasm.repository.ProjectRepository;
 
 import com.incture.erasm.exception.ResourceNotFoundException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 @Service
 public class AllocationService {
 
+	private static final Logger logger =LoggerFactory.getLogger(AllocationService.class);
     private final AllocationRepository allocationRepository;
     private final EmployeeRepository employeeRepository;
     private final ProjectRepository projectRepository;
@@ -42,6 +47,10 @@ public class AllocationService {
         Project project = projectRepository.findById(requestDto.getProjectId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
+        logger.info("Allocating employee {} to project {}",
+                employee.getEmployeeId(),
+                project.getProjectId());
+        
         Allocation allocation = new Allocation();
 
         allocation.setEmployee(employee);
@@ -53,6 +62,8 @@ public class AllocationService {
 
         Allocation savedAllocation = allocationRepository.save(allocation);
 
+        logger.info("Allocation created successfully.");
+        
         return AllocationMapper.entityToResponseDto(savedAllocation);
     }
 

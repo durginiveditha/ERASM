@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.incture.erasm.dto.request.ProjectRequestDto;
@@ -14,6 +15,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/projects")
+@PreAuthorize("hasAnyRole('ADMIN','DELIVERY_MANAGER')")
 public class ProjectController {
 
     private final ProjectService projectService;

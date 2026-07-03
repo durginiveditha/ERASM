@@ -13,9 +13,14 @@ import com.incture.erasm.repository.ProjectRepository;
 
 import com.incture.erasm.exception.ResourceNotFoundException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Service
 public class ProjectService {
 
+	private static final Logger logger =
+	        LoggerFactory.getLogger(ProjectService.class);
     private final ProjectRepository projectRepository;
 
     public ProjectService(ProjectRepository projectRepository) {
@@ -24,11 +29,11 @@ public class ProjectService {
 
     // Create
     public ProjectResponseDto createProject(ProjectRequestDto requestDto) {
-
+    	logger.info("Creating project: {}", requestDto.getProjectName());
         Project project = ProjectMapper.requestDtoToEntity(requestDto);
 
         Project savedProject = projectRepository.save(project);
-
+        logger.info("Project created successfully. Project ID: {}", savedProject.getProjectId());
         return ProjectMapper.entityToResponseDto(savedProject);
     }
 
@@ -36,7 +41,12 @@ public class ProjectService {
     public ProjectResponseDto getProjectById(Long projectId) {
 
         Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        		.orElseThrow(() -> {
+
+        		    logger.warn("Project not found with ID: {}", projectId);
+
+        		    return new ResourceNotFoundException("Project not found");
+        		});
 
         return ProjectMapper.entityToResponseDto(project);
     }
@@ -56,7 +66,12 @@ public class ProjectService {
             ProjectRequestDto requestDto) {
 
         Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        		.orElseThrow(() -> {
+
+        		    logger.warn("Project not found with ID: {}", projectId);
+
+        		    return new ResourceNotFoundException("Project not found");
+        		});
 
         ProjectMapper.updateEntityFromRequestDto(requestDto, project);
 
@@ -69,7 +84,12 @@ public class ProjectService {
     public void deleteProject(Long projectId) {
 
         Project project = projectRepository.findById(projectId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        		.orElseThrow(() -> {
+
+        		    logger.warn("Project not found with ID: {}", projectId);
+
+        		    return new ResourceNotFoundException("Project not found");
+        		});
 
         projectRepository.delete(project);
     }
