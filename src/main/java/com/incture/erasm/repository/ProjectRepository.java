@@ -8,7 +8,6 @@ import com.incture.erasm.entity.Project;
 
 public interface ProjectRepository extends JpaRepository<Project, Long> {
 
-    // Find project by name
     Optional<Project> findByProjectName(String projectName);
 
 }

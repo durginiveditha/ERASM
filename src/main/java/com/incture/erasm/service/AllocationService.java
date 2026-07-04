@@ -19,7 +19,7 @@ import com.incture.erasm.exception.ResourceNotFoundException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import com.incture.erasm.exception.AllocationException;
 
 @Service
 public class AllocationService {
@@ -42,15 +42,29 @@ public class AllocationService {
     public AllocationResponseDto createAllocation(AllocationRequestDto requestDto) {
 
         Employee employee = employeeRepository.findById(requestDto.getEmployeeId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found"));
 
         Project project = projectRepository.findById(requestDto.getProjectId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
+
+        List<Allocation> existingAllocations =
+                allocationRepository.findByEmployee(employee);
+
+        double totalAllocation = existingAllocations.stream()
+                .mapToDouble(Allocation::getAllocationPercentage)
+                .sum();
+
+        totalAllocation += requestDto.getAllocationPercentage();
+
+        if (totalAllocation > 100) {
+            throw new AllocationException(
+                    "Employee allocation cannot exceed 100%");
+        }
 
         logger.info("Allocating employee {} to project {}",
                 employee.getEmployeeId(),
                 project.getProjectId());
-        
+
         Allocation allocation = new Allocation();
 
         allocation.setEmployee(employee);
@@ -63,7 +77,7 @@ public class AllocationService {
         Allocation savedAllocation = allocationRepository.save(allocation);
 
         logger.info("Allocation created successfully.");
-        
+
         return AllocationMapper.entityToResponseDto(savedAllocation);
     }
 

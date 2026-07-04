@@ -38,7 +38,19 @@ public class ResourceRequestService {
 
         request.setRequiredSkill(requestDto.getRequiredSkill());
         request.setRequiredCount(requestDto.getRequiredCount());
-        request.setStatus(requestDto.getStatus());
+        List<String> validStatuses = List.of(
+                "DRAFT",
+                "SUBMITTED",
+                "REVIEW",
+                "APPROVED",
+                "ALLOCATED",
+                "COMPLETED"
+        );
+
+        if (!validStatuses.contains(requestDto.getStatus().toUpperCase())) {
+            throw new IllegalArgumentException("Invalid resource request status");
+        }
+        request.setStatus(requestDto.getStatus().toUpperCase());
         request.setProject(project);
 
         ResourceRequest savedRequest = resourceRequestRepository.save(request);
@@ -75,8 +87,21 @@ public class ResourceRequestService {
         Project project = projectRepository.findById(requestDto.getProjectId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        ResourceRequestMapper.updateEntityFromRequestDto(requestDto, request);
+        List<String> validStatuses = List.of(
+                "DRAFT",
+                "SUBMITTED",
+                "REVIEW",
+                "APPROVED",
+                "ALLOCATED",
+                "COMPLETED"
+        );
 
+        if (!validStatuses.contains(requestDto.getStatus().toUpperCase())) {
+            throw new IllegalArgumentException("Invalid resource request status");
+        }
+        
+        ResourceRequestMapper.updateEntityFromRequestDto(requestDto, request);
+        request.setStatus(requestDto.getStatus().toUpperCase());
         request.setProject(project);
 
         ResourceRequest updatedRequest = resourceRequestRepository.save(request);

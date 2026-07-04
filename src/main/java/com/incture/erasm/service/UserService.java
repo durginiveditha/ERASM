@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import com.incture.erasm.dto.request.UserRequestDto;
 import com.incture.erasm.dto.response.UserResponseDto;
 import com.incture.erasm.entity.User;
-import com.incture.erasm.exception.ResourceNotFoundException;
+import com.incture.erasm.exception.UserNotFoundException;
 import com.incture.erasm.mapper.UserMapper;
 import com.incture.erasm.repository.UserRepository;
 
@@ -50,7 +50,7 @@ public class UserService {
 
                     logger.warn("User not found with ID: {}", userId);
 
-                    return new ResourceNotFoundException("User not found");
+                    return new UserNotFoundException("User not found");
                 });
 
         return UserMapper.entityToResponseDto(user);
@@ -74,13 +74,13 @@ public class UserService {
 
                     logger.warn("User not found with ID: {}", userId);
 
-                    return new ResourceNotFoundException("User not found");
+                    return new UserNotFoundException("User not found");
                 });
 
         existingUser.setFirstName(requestDto.getFirstName());
         existingUser.setLastName(requestDto.getLastName());
         existingUser.setEmail(requestDto.getEmail());
-        existingUser.setPassword(requestDto.getPassword());
+        existingUser.setPassword(passwordEncoder.encode(requestDto.getPassword()));
         existingUser.setActive(requestDto.isActive());
 
         User updatedUser = userRepository.save(existingUser);
@@ -96,7 +96,7 @@ public class UserService {
 
                     logger.warn("User not found with ID: {}", userId);
 
-                    return new ResourceNotFoundException("User not found");
+                    return new UserNotFoundException("User not found");
                 });
 
         userRepository.delete(existingUser);

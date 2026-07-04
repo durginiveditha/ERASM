@@ -11,7 +11,7 @@ import com.incture.erasm.entity.Skill;
 import com.incture.erasm.mapper.SkillMapper;
 import com.incture.erasm.repository.SkillRepository;
 
-import com.incture.erasm.exception.ResourceNotFoundException;
+import com.incture.erasm.exception.SkillNotFoundException;
 
 @Service
 public class SkillService {
@@ -36,7 +36,7 @@ public class SkillService {
     public SkillResponseDto getSkillById(Long skillId) {
 
         Skill skill = skillRepository.findById(skillId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new SkillNotFoundException("Skill not found"));
 
         return SkillMapper.entityToResponseDto(skill);
     }
@@ -55,7 +55,7 @@ public class SkillService {
                                         SkillRequestDto requestDto) {
 
         Skill skill = skillRepository.findById(skillId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new SkillNotFoundException("Skill not found"));
 
         SkillMapper.updateEntityFromRequestDto(requestDto, skill);
 
@@ -68,7 +68,7 @@ public class SkillService {
     public void deleteSkill(Long skillId) {
 
         Skill skill = skillRepository.findById(skillId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new SkillNotFoundException("Skill not found"));
 
         skillRepository.delete(skill);
     }

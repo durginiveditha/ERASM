@@ -11,7 +11,7 @@ import com.incture.erasm.entity.Project;
 import com.incture.erasm.mapper.ProjectMapper;
 import com.incture.erasm.repository.ProjectRepository;
 
-import com.incture.erasm.exception.ResourceNotFoundException;
+import com.incture.erasm.exception.ProjectNotFoundException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +45,7 @@ public class ProjectService {
 
         		    logger.warn("Project not found with ID: {}", projectId);
 
-        		    return new ResourceNotFoundException("Project not found");
+        		    return new ProjectNotFoundException("Project not found");
         		});
 
         return ProjectMapper.entityToResponseDto(project);
@@ -70,7 +70,7 @@ public class ProjectService {
 
         		    logger.warn("Project not found with ID: {}", projectId);
 
-        		    return new ResourceNotFoundException("Project not found");
+        		    return new ProjectNotFoundException("Project not found");
         		});
 
         ProjectMapper.updateEntityFromRequestDto(requestDto, project);
@@ -88,7 +88,7 @@ public class ProjectService {
 
         		    logger.warn("Project not found with ID: {}", projectId);
 
-        		    return new ResourceNotFoundException("Project not found");
+        		    return new ProjectNotFoundException("Project not found");
         		});
 
         projectRepository.delete(project);

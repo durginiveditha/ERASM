@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import org.springframework.security.authorization.AuthorizationDeniedException;
 
+import com.incture.erasm.exception.AllocationException;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -38,6 +40,76 @@ public class GlobalExceptionHandler {
         error.setMessage(ex.getMessage());
 
         return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
+    }
+    
+    @ExceptionHandler(AllocationException.class)
+    public ResponseEntity<ErrorResponse> handleAllocationException(
+            AllocationException ex) {
+
+        ErrorResponse error = new ErrorResponse();
+
+        error.setTimestamp(LocalDateTime.now());
+        error.setStatus(HttpStatus.BAD_REQUEST.value());
+        error.setError("Allocation Error");
+        error.setMessage(ex.getMessage());
+
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+    
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgument(
+            IllegalArgumentException ex) {
+
+        ErrorResponse error = new ErrorResponse();
+
+        error.setTimestamp(LocalDateTime.now());
+        error.setStatus(HttpStatus.BAD_REQUEST.value());
+        error.setError("Bad Request");
+        error.setMessage(ex.getMessage());
+
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+    
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUserNotFound(
+            UserNotFoundException ex) {
+
+        ErrorResponse error = new ErrorResponse();
+
+        error.setTimestamp(LocalDateTime.now());
+        error.setStatus(HttpStatus.NOT_FOUND.value());
+        error.setError("User Not Found");
+        error.setMessage(ex.getMessage());
+
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+    
+    @ExceptionHandler(ProjectNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleProjectNotFound(
+            ProjectNotFoundException ex) {
+
+        ErrorResponse error = new ErrorResponse();
+
+        error.setTimestamp(LocalDateTime.now());
+        error.setStatus(HttpStatus.NOT_FOUND.value());
+        error.setError("Project Not Found");
+        error.setMessage(ex.getMessage());
+
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+    
+    @ExceptionHandler(SkillNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleSkillNotFound(
+            SkillNotFoundException ex) {
+
+        ErrorResponse error = new ErrorResponse();
+
+        error.setTimestamp(LocalDateTime.now());
+        error.setStatus(HttpStatus.NOT_FOUND.value());
+        error.setError("Skill Not Found");
+        error.setMessage(ex.getMessage());
+
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
     
     @ExceptionHandler(Exception.class)
