@@ -14,17 +14,17 @@ import com.incture.erasm.mapper.AllocationMapper;
 import com.incture.erasm.repository.AllocationRepository;
 import com.incture.erasm.repository.EmployeeRepository;
 import com.incture.erasm.repository.ProjectRepository;
-
+import com.incture.erasm.exception.AllocationException;
+import com.incture.erasm.exception.ProjectNotFoundException;
 import com.incture.erasm.exception.ResourceNotFoundException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.incture.erasm.exception.AllocationException;
 
 @Service
 public class AllocationService {
 
-	private static final Logger logger =LoggerFactory.getLogger(AllocationService.class);
+    private static final Logger logger = LoggerFactory.getLogger(AllocationService.class);
     private final AllocationRepository allocationRepository;
     private final EmployeeRepository employeeRepository;
     private final ProjectRepository projectRepository;
@@ -32,7 +32,6 @@ public class AllocationService {
     public AllocationService(AllocationRepository allocationRepository,
                              EmployeeRepository employeeRepository,
                              ProjectRepository projectRepository) {
-
         this.allocationRepository = allocationRepository;
         this.employeeRepository = employeeRepository;
         this.projectRepository = projectRepository;
@@ -42,10 +41,10 @@ public class AllocationService {
     public AllocationResponseDto createAllocation(AllocationRequestDto requestDto) {
 
         Employee employee = employeeRepository.findById(requestDto.getEmployeeId())
-                .orElseThrow(() -> new ResourceNotFoundException("Employee not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found with ID: " + requestDto.getEmployeeId()));
 
         Project project = projectRepository.findById(requestDto.getProjectId())
-                .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
+                .orElseThrow(() -> new ProjectNotFoundException("Project not found with ID: " + requestDto.getProjectId()));
 
         List<Allocation> existingAllocations =
                 allocationRepository.findByEmployee(employee);
@@ -57,8 +56,7 @@ public class AllocationService {
         totalAllocation += requestDto.getAllocationPercentage();
 
         if (totalAllocation > 100) {
-            throw new AllocationException(
-                    "Employee allocation cannot exceed 100%");
+            throw new AllocationException("Employee allocation cannot exceed 100%");
         }
 
         logger.info("Allocating employee {} to project {}",
@@ -66,7 +64,6 @@ public class AllocationService {
                 project.getProjectId());
 
         Allocation allocation = new Allocation();
-
         allocation.setEmployee(employee);
         allocation.setProject(project);
         allocation.setAllocationPercentage(requestDto.getAllocationPercentage());
@@ -75,7 +72,6 @@ public class AllocationService {
         allocation.setStatus(requestDto.getStatus());
 
         Allocation savedAllocation = allocationRepository.save(allocation);
-
         logger.info("Allocation created successfully.");
 
         return AllocationMapper.entityToResponseDto(savedAllocation);
@@ -84,8 +80,12 @@ public class AllocationService {
     // Get Allocation By Id
     public AllocationResponseDto getAllocationById(Long allocationId) {
 
+        logger.info("Fetching allocation with ID: {}", allocationId);
         Allocation allocation = allocationRepository.findById(allocationId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> {
+                    logger.warn("Allocation not found with ID: {}", allocationId);
+                    return new AllocationException("Allocation not found with ID: " + allocationId);
+                });
 
         return AllocationMapper.entityToResponseDto(allocation);
     }
@@ -93,6 +93,7 @@ public class AllocationService {
     // Get All Allocations
     public List<AllocationResponseDto> getAllAllocations() {
 
+        logger.info("Fetching all allocations");
         return allocationRepository.findAll()
                 .stream()
                 .map(AllocationMapper::entityToResponseDto)
@@ -103,21 +104,25 @@ public class AllocationService {
     public AllocationResponseDto updateAllocation(Long allocationId,
                                                   AllocationRequestDto requestDto) {
 
+        logger.info("Updating allocation with ID: {}", allocationId);
         Allocation allocation = allocationRepository.findById(allocationId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> {
+                    logger.warn("Allocation not found with ID: {}", allocationId);
+                    return new AllocationException("Allocation not found with ID: " + allocationId);
+                });
 
         Employee employee = employeeRepository.findById(requestDto.getEmployeeId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found with ID: " + requestDto.getEmployeeId()));
 
         Project project = projectRepository.findById(requestDto.getProjectId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ProjectNotFoundException("Project not found with ID: " + requestDto.getProjectId()));
 
         AllocationMapper.updateEntityFromRequestDto(requestDto, allocation);
-
         allocation.setEmployee(employee);
         allocation.setProject(project);
 
         Allocation updatedAllocation = allocationRepository.save(allocation);
+        logger.info("Allocation updated successfully. ID: {}", allocationId);
 
         return AllocationMapper.entityToResponseDto(updatedAllocation);
     }
@@ -125,9 +130,14 @@ public class AllocationService {
     // Delete Allocation
     public void deleteAllocation(Long allocationId) {
 
+        logger.info("Deleting allocation with ID: {}", allocationId);
         Allocation allocation = allocationRepository.findById(allocationId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> {
+                    logger.warn("Allocation not found with ID: {}", allocationId);
+                    return new AllocationException("Allocation not found with ID: " + allocationId);
+                });
 
         allocationRepository.delete(allocation);
+        logger.info("Allocation deleted successfully. ID: {}", allocationId);
     }
 }
